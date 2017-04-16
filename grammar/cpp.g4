@@ -1,11 +1,11 @@
 /**
-* This a CPP Pseudo-grammar (meaning not that good). It does succesfully parse
+* This a CPP Pseudo-grammar (meaning not that good). It does successfully parse
 * standard C source files and identify macro names and includes; the current
 * syntax tree could be extended to parse more specific. This is solely a
 * demonstration of the how "modes" can be distinguished by including the
 * newline character in a grammar. For whatever reason, I can actually make
 * ANTLR4 "modes" to work. But entering the "preprocessor" rule is sufficiently
-* concidered being in the preprocessor "mode" and everything else is source
+* considered being in the preprocessor "mode" and everything else is source
 * code.
 */
 grammar cpp;
