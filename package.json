@@ -1,0 +1,30 @@
+{
+  "name": "js-cpp",
+  "version": "0.0.0",
+  "description": "A node-native C parser written with Flex & Bison",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matutter/js-cpp.git"
+  },
+  "keywords": [
+    "c",
+    "parser"
+  ],
+  "author": "matutter",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matutter/js-cpp/issues"
+  },
+  "homepage": "https://github.com/matutter/js-cpp#readme",
+  "dependencies": {
+    "debug": "^2.6.3",
+    "nan": "^2.6.2"
+  }
+}
