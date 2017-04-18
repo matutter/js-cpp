@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "A node-native C parser written with Flex & Bison",
   "main": "index.js",
+  "gypfile": true,
   "directories": {
     "test": "test"
   },
