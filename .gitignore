@@ -1,3 +1,14 @@
 build/
 node_modules/
 
+*.o
+*.so
+*.os
+
+# flex and bison artifacts
+*.output
+*.tab.h
+*.yy.h
+*.hh
+*.tab.c
+*.yy.c
