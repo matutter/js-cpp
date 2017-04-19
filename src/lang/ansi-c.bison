@@ -14,6 +14,9 @@
   #define YY_TYPEDEF_YY_SCANNER_T
     typedef void* yyscan_t;
   #endif
+  
+  #include <string>
+  #include "lang/parser/parser.h"
 
 }
 
@@ -27,14 +30,22 @@
  
 %}
 
-%skeleton     "lalr1.cc"
-%lex-param    { yyscan_t scanner }
-%parse-param  { Object** objects }
-%parse-param  { yyscan_t scanner }
+%skeleton "lalr1.cc"
+%require "3.0.4"
+%defines
+%define parser_class_name {cppjs::Parser}
+%define api.token.constructor
+%define api.value.type variant
+%define parse.assert
+%param { cppjs::Parser& parser }
+%define parse.trace
+%define parse.error verbose
 
-%union {
-  char* raw;
-}
+%locations
+%initial-action {
+  // Initialize the initial location.
+  @$.begin.filename = @$.end.filename = &parser.file;
+};
 
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
@@ -455,7 +466,8 @@ function_definition
 
 %%
 
-int yyerror(yyscan_t scanner, const char *msg) {
-  debug_danger("%s", msg);
+void yy::error(const location_type& l, const std::string& m) {
+  parser.error(m);
 }
+
 

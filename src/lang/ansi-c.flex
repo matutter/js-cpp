@@ -4,8 +4,6 @@
   * Initial definition from https://www.lysator.liu.se/c/ANSI-C-grammar-l.html
   */
 
-  #include <stdio.h>
-  #include <ctype.h>
   #include "debug.h"
   #include "lang/ansi-c.types.h"
   #include "lang/ansi-c.tab.h"
@@ -14,7 +12,7 @@
 
 %option outfile="ansi-c.yy.c" header-file="ansi-c.yy.h"
 %option warn nodefault
-%option reentrant noyywrap never-interactive nounistd bison-bridge
+%option noyywrap never-interactive nounistd
 %option c++
 
 D   [0-9]
