@@ -7,8 +7,7 @@ node_modules/
 
 # flex and bison artifacts
 *.output
-*.tab.h
-*.yy.h
-*.hh
-*.tab.c
-*.yy.c
+*.tab.hh
+*.yy.hh
+*.tab.cc
+*.yy.cc
