@@ -11,3 +11,6 @@ node_modules/
 *.yy.hh
 *.tab.cc
 *.yy.cc
+location.hh
+position.hh
+stack.hh
