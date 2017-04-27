@@ -1,17 +1,30 @@
 .RECIPEPREFIX = |
-.PHONY: all clean parser
+.PHONY: all clean run setup generate_sources
 
-src_d := $(abspath src)
+#
+# Builds the test/main.cc parser program for testing as an executable
+#
 
-CXXFLAGS := -I${src_d}
+CXX = g++
+CINCL = -Isrc 
+CXXFLAGS = -DDEBUG_ON
 
-export CXXFLAGS
+SOURCES = $(shell find -name *.cc) test/main.cc
 
-all: parser
-|@ echo "(done)"
+all: setup generate_sources main.o
 
-parser:
-| make -C src/lang/parse
+main.o: test/main.cc
+| ${CXX} ${CXXFLAGS} ${CINCL} ${SOURCES} -o main.o
+
+setup:
+
+generate_sources:
+| make -C src/lang/grammar all
 
 clean:
-| make -C src/lang/parse clean
+| make -C src/lang/grammar clean
+| rm -f main.o
+
+run: all
+| ./main.o -p -s test/sample_input/sample.c
+
