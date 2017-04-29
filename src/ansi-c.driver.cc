@@ -7,33 +7,31 @@
 // should actually register the located error messages and set error state.
 
 #include <string>
+#include "debug.h"
 #include "ansi-c.driver.hh"
 #include "lang/grammar/ansi-c.tab.hh"
 
-AnsiCDriver::AnsiCDriver () : trace_scanning (false), trace_parsing (false) {
+AnsiCDriver::AnsiCDriver() : trace_scanning (false), trace_parsing (false) {}
+AnsiCDriver::~AnsiCDriver() {}
+
+int AnsiCDriver::parse(const std::string &f) {
+  this->file = f;
+  this->scan_begin();
+  yy::AnsiCParser* parser = new yy::AnsiCParser(*this); 
+  parser->set_debug_level(trace_parsing);
+  this->result = parser->parse();
+  scan_end();
+  delete parser;
+  return this->result;
 }
 
-AnsiCDriver::~AnsiCDriver () {
+void AnsiCDriver::error(const yy::location& l, const std::string& m) {
+  debug_danger_cxx( l << ": " << m );
 }
 
-int AnsiCDriver::parse (const std::string &f) {
-  file = f;
-  scan_begin ();
-  yy::AnsiCParser parser (*this);
-  parser.set_debug_level (trace_parsing);
-  int res = parser.parse ();
-  scan_end ();
-  return res;
+void AnsiCDriver::error(const std::string& m) {
+  debug_danger_cxx(m);
 }
-
-void AnsiCDriver::error (const yy::location& l, const std::string& m) {
-  std::cerr << l << ": " << m << std::endl;
-}
-
-void AnsiCDriver::error (const std::string& m) {
-  std::cerr << m << std::endl;
-}
-
 
 void AnsiCDriver::comment() {
   /*char c, c1;
@@ -53,5 +51,4 @@ void AnsiCDriver::comment() {
     }
     */
 }
-
 

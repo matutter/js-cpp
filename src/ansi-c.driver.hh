@@ -4,6 +4,9 @@
 #include <string>
 #include <map>
 #include "lang/grammar/ansi-c.tab.hh"
+#include "lang/grammar/location.hh"
+
+
 
 // Tell Flex the lexer's prototype ...
 #define YY_DECL \

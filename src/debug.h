@@ -31,6 +31,7 @@
 
   #else
 
+    #include <iostream>
     #include <cstdio>
 
     #define DBG_KEY() KYEL "  cppnn " KRST
@@ -49,6 +50,12 @@
 
     #define debug_success(fmt, args...) \
       debug(KGRN fmt, ##args)
+
+    #define debug_cxx(stream) \
+      std::cout << DBG_KEY() << stream << KRST << std::endl;
+
+    #define debug_danger_cxx(stream) \
+      debug_cxx( KRED << stream )
 
   #endif
 

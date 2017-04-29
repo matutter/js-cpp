@@ -1,5 +1,5 @@
 .RECIPEPREFIX = |
-.PHONY: all clean run setup generate_sources
+.PHONY:  clean run setup generate_sources
 
 #
 # Builds the test/main.cc parser program for testing as an executable
@@ -7,13 +7,13 @@
 
 CXX = g++
 CINCL = -Isrc 
-CXXFLAGS = -DDEBUG_ON
+CXXFLAGS = -DDEBUG_ON -g -ggdb
 
-SOURCES = $(shell find -name *.cc) test/main.cc
+SOURCES = $(shell find src -name *.cc) test/main.cc
 
 all: setup generate_sources main.o
 
-main.o: test/main.cc
+main.o: test/main.cc src/debug.h
 | ${CXX} ${CXXFLAGS} ${CINCL} ${SOURCES} -o main.o
 
 setup:

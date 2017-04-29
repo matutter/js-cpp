@@ -1,15 +1,15 @@
 .RECIPEPREFIX = |
-.PHONY: all clean
+.PHONY:  clean
 
 name := ansi-c
 
-all: ${name}.yy.c ${name}.tab.c
+all: ${name}.yy.cc ${name}.tab.cc
 |@ echo "done"
 
-${name}.yy.c: ${name}.flex
+${name}.yy.cc: ${name}.flex
 | flex -vd ${name}.flex
 
-${name}.tab.c: ${name}.bison
+${name}.tab.cc: ${name}.bison
 | bison -vd ${name}.bison
 
 clean:

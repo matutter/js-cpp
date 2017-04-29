@@ -4,13 +4,10 @@
   #include <cstdlib>
   #include <string>
   
+  #include "debug.h"
   #include "ansi-c.driver.hh"
   #include "lang/grammar/ansi-c.tab.hh"
 
-  // Work around an incompatibility in flex (at least versions
-  // 2.5.31 through 2.5.33): it generates code that does
-  // not conform to C89.  See Debian bug 333231
-  // <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=333231>.
   #undef yywrap
   #define yywrap() 1
 
@@ -73,7 +70,7 @@ IS  (u|U|l|L)*
 "volatile" return yy::AnsiCParser::make_VOLATILE(loc);
 "while"    return yy::AnsiCParser::make_WHILE(loc);
 
-{L}({L}|{D})*    return yy::AnsiCParser::make_IDENTIFIER()(loc);
+{L}({L}|{D})*    return yy::AnsiCParser::make_IDENTIFIER(loc);
 
 0[xX]{H}+{IS}?    return yy::AnsiCParser::make_CONSTANT(loc);
 0{D}+{IS}?        return yy::AnsiCParser::make_CONSTANT(loc);
@@ -107,47 +104,47 @@ L?\"(\\.|[^\\"])*\" return yy::AnsiCParser::make_STRING_LITERAL(loc);
 ">="      return yy::AnsiCParser::make_GE_OP(loc);
 "=="      return yy::AnsiCParser::make_EQ_OP(loc);
 "!="      return yy::AnsiCParser::make_NE_OP(loc);
-";"     return ';';
-("{"|"<%")    return '{';
-("}"|"%>")    return '}';
-","     return ',';
-":"     return ':';
-"="     return '=';
-"("     return '(';
-")"     return ')';
-("["|"<:")    return '[';
-("]"|":>")    return ']';
-"."     return '.';
-"&"     return '&';
-"!"     return '!';
-"~"     return '~';
-"-"     return '-';
-"+"     return '+';
-"*"     return '*';
-"/"     return '/';
-"%"     return '%';
-"<"     return '<';
-">"     return '>';
-"^"     return '^';
-"|"     return '|';
-"?"     return '?';
+";"       return yy::AnsiCParser::make_SEMICOLON(loc);
+("{"|"<%")    return yy::AnsiCParser::make_LSET(loc);
+("}"|"%>")    return yy::AnsiCParser::make_RSET(loc);
+","       return yy::AnsiCParser::make_COMMA(loc);
+":"       return yy::AnsiCParser::make_COLON(loc);
+"="       return yy::AnsiCParser::make_EQ(loc);
+"("       return yy::AnsiCParser::make_LPAREN(loc);
+")"       return yy::AnsiCParser::make_RPAREN(loc);
+("["|"<:")    return yy::AnsiCParser::make_LDOMAIN(loc);
+("]"|":>")    return yy::AnsiCParser::make_RDOMAIN(loc);
+"."       return yy::AnsiCParser::make_FS(loc);
+"&"       return yy::AnsiCParser::make_BIN_AND(loc);
+"!"       return yy::AnsiCParser::make_LOGIC_NOT(loc);
+"~"       return yy::AnsiCParser::make_BIN_ONES_COMP(loc);
+"-"       return yy::AnsiCParser::make_SUBTRACTION(loc);
+"+"       return yy::AnsiCParser::make_ADDITION(loc);
+"*"       return yy::AnsiCParser::make_MULTIPLICATION(loc);
+"/"       return yy::AnsiCParser::make_DIVISION(loc);
+"%"       return yy::AnsiCParser::make_MODULUS(loc);
+"<"       return yy::AnsiCParser::make_LANGLE(loc);
+">"       return yy::AnsiCParser::make_RANGLE(loc);
+"^"       return yy::AnsiCParser::make_BIN_XOR(loc);
+"|"       return yy::AnsiCParser::make_BIN_OR(loc);
+"?"       return yy::AnsiCParser::make_CONDITION(loc);
 
 [ \t\v\n\f]   {  }
 
+<<EOF>>  return yy::AnsiCParser::make_END(loc);
+
 %%
 
-void AnsiCDriver::scan_begin () {
+void AnsiCDriver::scan_begin() {
   yy_flex_debug = trace_scanning;
-  if (file.empty () || file == "-") {
+  if (file.empty() || file == "-") {
     yyin = stdin;
-  } else if (!(yyin = fopen (file.c_str (), "r"))) {
-    error ("cannot open " + file + ": " + strerror(errno));
-    exit (EXIT_FAILURE);
+  } else if(!(yyin = fopen(file.c_str (), "r"))) {
+    error("cannot open " + file + ": " + strerror(errno));
+    exit(EXIT_FAILURE);
   }
 }
 
-void AnsiCDriver::scan_end () {
-  fclose (yyin);
+void AnsiCDriver::scan_end() {
+  fclose(yyin);
 }
-
-

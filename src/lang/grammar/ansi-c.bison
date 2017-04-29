@@ -12,7 +12,7 @@
 
 %code requires {
   #include <string>
-  #include "ansi-c.driver.hh"
+  #include "debug.h"
   class AnsiCDriver;
 }
 
@@ -44,26 +44,30 @@
 %token TYPEDEF EXTERN STATIC AUTO REGISTER
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
 %token STRUCT UNION ENUM ELLIPSIS
-
+%token SEMICOLON COMMA COLON EQ FS LOGIC_NOT SUBTRACTION ADDITION MULTIPLICATION DIVISION MODULUS CONDITION 
+%token LSET RSET LPAREN RPAREN LDOMAIN RDOMAIN LANGLE RANGLE
+%token BIN_AND BIN_ONES_COMP BIN_XOR BIN_OR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+%token END 0 "<<EOF>>"
 
-%start translation_unit
-
+%left ELSE
 %%
+
+%start translation_unit;
 
 primary_expression
   : IDENTIFIER
   | CONSTANT
   | STRING_LITERAL
-  | '(' expression ')'
+  | LPAREN expression RPAREN
   ;
 
 postfix_expression
   : primary_expression
-  | postfix_expression '[' expression ']'
-  | postfix_expression '(' ')'
-  | postfix_expression '(' argument_expression_list ')'
-  | postfix_expression '.' IDENTIFIER
+  | postfix_expression LDOMAIN expression RDOMAIN
+  | postfix_expression LPAREN RPAREN
+  | postfix_expression LPAREN argument_expression_list RPAREN
+  | postfix_expression FS IDENTIFIER
   | postfix_expression PTR_OP IDENTIFIER
   | postfix_expression INC_OP
   | postfix_expression DEC_OP
@@ -71,7 +75,7 @@ postfix_expression
 
 argument_expression_list
   : assignment_expression
-  | argument_expression_list ',' assignment_expression
+  | argument_expression_list COMMA assignment_expression
   ;
 
 unary_expression
@@ -80,34 +84,34 @@ unary_expression
   | DEC_OP unary_expression
   | unary_operator cast_expression
   | SIZEOF unary_expression
-  | SIZEOF '(' type_name ')'
+  | SIZEOF LPAREN type_name RPAREN
   ;
 
 unary_operator
-  : '&'
-  | '*'
-  | '+'
-  | '-'
-  | '~'
-  | '!'
+  : BIN_AND
+  | MULTIPLICATION
+  | ADDITION
+  | SUBTRACTION
+  | BIN_ONES_COMP
+  | LOGIC_NOT
   ;
 
 cast_expression
   : unary_expression
-  | '(' type_name ')' cast_expression
+  | LPAREN type_name RPAREN cast_expression
   ;
 
 multiplicative_expression
   : cast_expression
-  | multiplicative_expression '*' cast_expression
-  | multiplicative_expression '/' cast_expression
-  | multiplicative_expression '%' cast_expression
+  | multiplicative_expression MULTIPLICATION cast_expression
+  | multiplicative_expression DIVISION cast_expression
+  | multiplicative_expression MODULUS cast_expression
   ;
 
 additive_expression
   : multiplicative_expression
-  | additive_expression '+' multiplicative_expression
-  | additive_expression '-' multiplicative_expression
+  | additive_expression ADDITION multiplicative_expression
+  | additive_expression SUBTRACTION multiplicative_expression
   ;
 
 shift_expression
@@ -118,8 +122,8 @@ shift_expression
 
 relational_expression
   : shift_expression
-  | relational_expression '<' shift_expression
-  | relational_expression '>' shift_expression
+  | relational_expression LANGLE shift_expression
+  | relational_expression RANGLE shift_expression
   | relational_expression LE_OP shift_expression
   | relational_expression GE_OP shift_expression
   ;
@@ -132,17 +136,17 @@ equality_expression
 
 and_expression
   : equality_expression
-  | and_expression '&' equality_expression
+  | and_expression BIN_AND equality_expression
   ;
 
 exclusive_or_expression
   : and_expression
-  | exclusive_or_expression '^' and_expression
+  | exclusive_or_expression BIN_XOR and_expression
   ;
 
 inclusive_or_expression
   : exclusive_or_expression
-  | inclusive_or_expression '|' exclusive_or_expression
+  | inclusive_or_expression BIN_OR exclusive_or_expression
   ;
 
 logical_and_expression
@@ -157,7 +161,7 @@ logical_or_expression
 
 conditional_expression
   : logical_or_expression
-  | logical_or_expression '?' expression ':' conditional_expression
+  | logical_or_expression CONDITION expression COLON conditional_expression
   ;
 
 assignment_expression
@@ -166,7 +170,7 @@ assignment_expression
   ;
 
 assignment_operator
-  : '='
+  : EQ
   | MUL_ASSIGN
   | DIV_ASSIGN
   | MOD_ASSIGN
@@ -181,7 +185,7 @@ assignment_operator
 
 expression
   : assignment_expression
-  | expression ',' assignment_expression
+  | expression COMMA assignment_expression
   ;
 
 constant_expression
@@ -189,8 +193,8 @@ constant_expression
   ;
 
 declaration
-  : declaration_specifiers ';'
-  | declaration_specifiers init_declarator_list ';'
+  : declaration_specifiers SEMICOLON
+  | declaration_specifiers init_declarator_list SEMICOLON
   ;
 
 declaration_specifiers
@@ -204,12 +208,12 @@ declaration_specifiers
 
 init_declarator_list
   : init_declarator
-  | init_declarator_list ',' init_declarator
+  | init_declarator_list COMMA init_declarator
   ;
 
 init_declarator
   : declarator
-  | declarator '=' initializer
+  | declarator EQ initializer
   ;
 
 storage_class_specifier
@@ -236,8 +240,8 @@ type_specifier
   ;
 
 struct_or_union_specifier
-  : struct_or_union IDENTIFIER '{' struct_declaration_list '}'
-  | struct_or_union '{' struct_declaration_list '}'
+  : struct_or_union IDENTIFIER LSET struct_declaration_list RSET
+  | struct_or_union LSET struct_declaration_list RSET
   | struct_or_union IDENTIFIER
   ;
 
@@ -252,7 +256,7 @@ struct_declaration_list
   ;
 
 struct_declaration
-  : specifier_qualifier_list struct_declarator_list ';'
+  : specifier_qualifier_list struct_declarator_list SEMICOLON
   ;
 
 specifier_qualifier_list
@@ -264,29 +268,29 @@ specifier_qualifier_list
 
 struct_declarator_list
   : struct_declarator
-  | struct_declarator_list ',' struct_declarator
+  | struct_declarator_list COMMA struct_declarator
   ;
 
 struct_declarator
   : declarator
-  | ':' constant_expression
-  | declarator ':' constant_expression
+  | COLON constant_expression
+  | declarator COLON constant_expression
   ;
 
 enum_specifier
-  : ENUM '{' enumerator_list '}'
-  | ENUM IDENTIFIER '{' enumerator_list '}'
+  : ENUM LSET enumerator_list RSET
+  | ENUM IDENTIFIER LSET enumerator_list RSET
   | ENUM IDENTIFIER
   ;
 
 enumerator_list
   : enumerator
-  | enumerator_list ',' enumerator
+  | enumerator_list COMMA enumerator
   ;
 
 enumerator
   : IDENTIFIER
-  | IDENTIFIER '=' constant_expression
+  | IDENTIFIER EQ constant_expression
   ;
 
 type_qualifier
@@ -301,19 +305,19 @@ declarator
 
 direct_declarator
   : IDENTIFIER
-  | '(' declarator ')'
-  | direct_declarator '[' constant_expression ']'
-  | direct_declarator '[' ']'
-  | direct_declarator '(' parameter_type_list ')'
-  | direct_declarator '(' identifier_list ')'
-  | direct_declarator '(' ')'
+  | LPAREN declarator RPAREN
+  | direct_declarator LDOMAIN constant_expression RDOMAIN
+  | direct_declarator LDOMAIN RDOMAIN
+  | direct_declarator LPAREN parameter_type_list RPAREN
+  | direct_declarator LPAREN identifier_list RPAREN
+  | direct_declarator LPAREN RPAREN
   ;
 
 pointer
-  : '*'
-  | '*' type_qualifier_list
-  | '*' pointer
-  | '*' type_qualifier_list pointer
+  : MULTIPLICATION
+  | MULTIPLICATION type_qualifier_list
+  | MULTIPLICATION pointer
+  | MULTIPLICATION type_qualifier_list pointer
   ;
 
 type_qualifier_list
@@ -324,12 +328,12 @@ type_qualifier_list
 
 parameter_type_list
   : parameter_list
-  | parameter_list ',' ELLIPSIS
+  | parameter_list COMMA ELLIPSIS
   ;
 
 parameter_list
   : parameter_declaration
-  | parameter_list ',' parameter_declaration
+  | parameter_list COMMA parameter_declaration
   ;
 
 parameter_declaration
@@ -340,7 +344,7 @@ parameter_declaration
 
 identifier_list
   : IDENTIFIER
-  | identifier_list ',' IDENTIFIER
+  | identifier_list COMMA IDENTIFIER
   ;
 
 type_name
@@ -355,26 +359,26 @@ abstract_declarator
   ;
 
 direct_abstract_declarator
-  : '(' abstract_declarator ')'
-  | '[' ']'
-  | '[' constant_expression ']'
-  | direct_abstract_declarator '[' ']'
-  | direct_abstract_declarator '[' constant_expression ']'
-  | '(' ')'
-  | '(' parameter_type_list ')'
-  | direct_abstract_declarator '(' ')'
-  | direct_abstract_declarator '(' parameter_type_list ')'
+  : LPAREN abstract_declarator RPAREN
+  | LDOMAIN RDOMAIN
+  | LDOMAIN constant_expression RDOMAIN
+  | direct_abstract_declarator LDOMAIN RDOMAIN
+  | direct_abstract_declarator LDOMAIN constant_expression RDOMAIN
+  | LPAREN RPAREN
+  | LPAREN parameter_type_list RPAREN
+  | direct_abstract_declarator LPAREN RPAREN
+  | direct_abstract_declarator LPAREN parameter_type_list RPAREN
   ;
 
 initializer
   : assignment_expression
-  | '{' initializer_list '}'
-  | '{' initializer_list ',' '}'
+  | LSET initializer_list RSET
+  | LSET initializer_list COMMA RSET
   ;
 
 initializer_list
   : initializer
-  | initializer_list ',' initializer
+  | initializer_list COMMA initializer
   ;
 
 statement
@@ -387,16 +391,16 @@ statement
   ;
 
 labeled_statement
-  : IDENTIFIER ':' statement
-  | CASE constant_expression ':' statement
-  | DEFAULT ':' statement
+  : IDENTIFIER COLON statement
+  | CASE constant_expression COLON statement
+  | DEFAULT COLON statement
   ;
 
 compound_statement
-  : '{' '}'
-  | '{' statement_list '}'
-  | '{' declaration_list '}'
-  | '{' declaration_list statement_list '}'
+  : LSET RSET
+  | LSET statement_list RSET
+  | LSET declaration_list RSET
+  | LSET declaration_list statement_list RSET
   ;
 
 declaration_list
@@ -410,34 +414,34 @@ statement_list
   ;
 
 expression_statement
-  : ';'
-  | expression ';'
+  : SEMICOLON
+  | expression SEMICOLON
   ;
 
 selection_statement
-  : IF '(' expression ')' statement
-  | IF '(' expression ')' statement ELSE statement
-  | SWITCH '(' expression ')' statement
+  : IF LPAREN expression RPAREN statement
+  | IF LPAREN expression RPAREN statement ELSE statement
+  | SWITCH LPAREN expression RPAREN statement
   ;
 
 iteration_statement
-  : WHILE '(' expression ')' statement
-  | DO statement WHILE '(' expression ')' ';'
-  | FOR '(' expression_statement expression_statement ')' statement
-  | FOR '(' expression_statement expression_statement expression ')' statement
+  : WHILE LPAREN expression RPAREN statement
+  | DO statement WHILE LPAREN expression RPAREN SEMICOLON
+  | FOR LPAREN expression_statement expression_statement RPAREN statement
+  | FOR LPAREN expression_statement expression_statement expression RPAREN statement
   ;
 
 jump_statement
-  : GOTO IDENTIFIER ';'
-  | CONTINUE ';'
-  | BREAK ';'
-  | RETURN ';'
-  | RETURN expression ';'
+  : GOTO IDENTIFIER SEMICOLON
+  | CONTINUE SEMICOLON
+  | BREAK SEMICOLON
+  | RETURN SEMICOLON
+  | RETURN expression SEMICOLON
   ;
 
 translation_unit
-  : external_declaration
-  | translation_unit external_declaration
+  : external_declaration    { debug_cxx("HELLO WORLD 1"); }
+  | translation_unit external_declaration   { debug_cxx("HELLO WORLD 2"); }
   ;
 
 external_declaration
