@@ -5,8 +5,8 @@
   #include <string>
   
   #include "debug.h"
-  #include "ansi-c.driver.hh"
-  #include "lang/grammar/ansi-c.tab.hh"
+  #include "lang/ansi-c/driver.hh"
+  #include "lang/ansi-c/parse.hh"
 
   #undef yywrap
   #define yywrap() 1
@@ -15,7 +15,7 @@
   static yy::location loc;
 %}
 
-%option outfile="ansi-c.yy.cc" header-file="ansi-c.yy.hh"
+%option outfile="lex.cc" header-file="lex.hh"
 %option noyywrap nounput batch debug noinput
 
 

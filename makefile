@@ -19,10 +19,10 @@ main.o: test/main.cc src/debug.h
 setup:
 
 generate_sources:
-| make -C src/lang/grammar all
+| make -C src/lang/ansi-c all
 
 clean:
-| make -C src/lang/grammar clean
+| make -C src/lang/ansi-c clean
 | rm -f main.o
 
 run: all

@@ -1,6 +1,6 @@
 #include <iostream>
-#include "ansi-c.driver.hh"
-#include "lang/grammar/ansi-c.tab.hh"
+#include "lang/ansi-c/driver.hh"
+#include "lang/ansi-c/parse.hh"
 
 
 int main (int argc, char *argv[]) {

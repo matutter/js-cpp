@@ -8,8 +8,8 @@
 
 #include <string>
 #include "debug.h"
-#include "ansi-c.driver.hh"
-#include "lang/grammar/ansi-c.tab.hh"
+#include "lang/ansi-c/driver.hh"
+#include "lang/ansi-c/parse.hh"
 
 AnsiCDriver::AnsiCDriver() : trace_scanning (false), trace_parsing (false) {}
 AnsiCDriver::~AnsiCDriver() {}

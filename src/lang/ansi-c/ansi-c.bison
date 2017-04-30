@@ -3,8 +3,8 @@
 %require "3.0.4"
 %define parser_class_name {AnsiCParser}
 
-%output  "ansi-c.tab.cc"
-%defines "ansi-c.tab.hh"
+%output  "parse.cc"
+%defines "parse.hh"
 
 %define api.token.constructor
 %define api.value.type variant
@@ -30,7 +30,7 @@
 %define parse.error verbose
 
 %code {
-  #include "ansi-c.driver.hh"
+  #include "lang/ansi-c/driver.hh"
 }
 
 %define api.token.prefix {TOK_}
@@ -50,7 +50,8 @@
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 %token END 0 "<<EOF>>"
 
-%left ELSE
+// required by selection_statement
+%expect 1
 %%
 
 %start translation_unit;
