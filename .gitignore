@@ -1,5 +1,20 @@
+build/
+node_modules/
 
-*.jar
-*.java
-*.class
-*.tokens
+*.o
+*.so
+*.os
+
+# flex and bison artifacts
+*.output
+*.tab.hh
+*.yy.hh
+*.tab.cc
+*.yy.cc
+parse.hh
+parse.cc
+lex.hh
+lex.cc
+location.hh
+position.hh
+stack.hh
